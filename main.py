@@ -1,4 +1,4 @@
-import pygame
+import pygame # type: ignore
 from os.path import join
 from random import randint
 
@@ -15,11 +15,13 @@ clock = pygame.time.Clock()
 # Plain surface
 surf = pygame.Surface((100,200))
 surf.fill("purple")
+x = 100
 
 # Player Surface
 player_surf = pygame.image.load(join("images", "player.png")).convert_alpha()
 player_rect = player_surf.get_frect(center = (WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2))
-player_direction = 1
+player_direction = pygame.math.Vector2(1,1)
+player_speed = 300
 
 # Background
 bg_color = "darkgray"
@@ -39,7 +41,7 @@ laser_rect = meteror_surf.get_frect(bottomleft = (20, WINDOW_HEIGHT - 20))
 
 while running:
 
-    clock.tick(60)
+    dt = clock.tick() / 1000
 
     # Event Loop
     for event in pygame.event.get():
@@ -60,9 +62,12 @@ while running:
     display_surface.blit(laser_surf, laser_rect)
 
     # Player Movement
-    player_rect.x += player_direction * 0.4
+    if player_rect.bottom > WINDOW_HEIGHT or player_rect.top < 0:
+        player_direction.y *= -1
     if player_rect.right > WINDOW_WIDTH or player_rect.left < 0:
-        player_direction *= -1
+        player_direction.x *= -1
+
+    player_rect.center += player_direction * player_speed * dt
     display_surface.blit(player_surf, player_rect)
 
 
